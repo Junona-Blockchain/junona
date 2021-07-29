@@ -114,6 +114,14 @@ public:
 
    void set_shorten_abi_errors( bool f ) { shorten_abi_errors = f; }
 
+   using get_auction_params = empty;
+
+   struct get_auction_results {
+      bool vote_auction_started;
+   };
+
+   get_auction_results get_auction(const get_auction_params&) const;
+
    using get_info_params = empty;
 
    struct get_info_results {
@@ -1138,3 +1146,4 @@ FC_REFLECT( eosio::chain_apis::read_only::abi_bin_to_json_params, (code)(action)
 FC_REFLECT( eosio::chain_apis::read_only::abi_bin_to_json_result, (args) )
 FC_REFLECT( eosio::chain_apis::read_only::get_required_keys_params, (transaction)(available_keys) )
 FC_REFLECT( eosio::chain_apis::read_only::get_required_keys_result, (required_keys) )
+FC_REFLECT( eosio::chain_apis::read_only::get_auction_results, (vote_auction_started) )

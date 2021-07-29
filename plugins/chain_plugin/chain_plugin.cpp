@@ -1729,6 +1729,33 @@ read_only::get_info_results read_only::get_info(const read_only::get_info_params
    };
 }
 
+read_only::get_auction_results read_only::get_auction(const read_only::get_auction_params&) const {
+   const auto& d = db.db();
+   const auto* table = d.find<chain::table_id_object, chain::by_code_scope_table>(
+           boost::make_tuple(config::system_account_name, config::system_account_name, "global4"_n));
+   read_only::get_auction_results result;
+   if( table != nullptr ) {
+         const auto &idx = d.get_index<key_value_index, by_scope_primary>();
+         walk_key_value_table("eosio"_n, "eosio"_n, "global4"_n, [&](const auto& obj){
+            fc::datastream<const char *> ds(obj.value.data(), obj.value.size());
+            fc::raw::unpack(ds, result.vote_auction_started);
+            return true;
+         });
+         /*
+         auto it = idx.find(boost::make_tuple( table->id, "global4"_n ));
+         if( it != idx.end() && it->value.size() >= sizeof(asset) ) {
+            fc::datastream<const char *> ds(it->value.data(), it->value.size());
+            account_name bidder;
+            fc::raw::unpack(ds, result.vote_auction_started);
+//            fc::raw::unpack(ds, result.vote_high_bidder);
+//            fc::raw::unpack(ds, result.vote_high_bid);
+//            fc::raw::unpack(ds, result.vote_last_bid_time);
+         }*/
+      }
+
+   return result;
+}
+
 read_only::get_activated_protocol_features_results
 read_only::get_activated_protocol_features( const read_only::get_activated_protocol_features_params& params )const {
    read_only::get_activated_protocol_features_results result;

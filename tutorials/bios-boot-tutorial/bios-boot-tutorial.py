@@ -27,6 +27,7 @@ systemAccounts = [
     'eosio.token',
     'eosio.vpay',
     'eosio.rex',
+    'eosio.vote',
 ]
 
 def jsonArg(a):
@@ -295,10 +296,13 @@ def stepStartBoot():
 def stepInstallSystemContracts():
     run(args.cleos + 'set contract eosio.token ' + args.contracts_dir + '/eosio.token/')
     run(args.cleos + 'set contract eosio.msig ' + args.contracts_dir + '/eosio.msig/')
+    run(args.cleos + 'set contract eosio.vote ' + args.contracts_dir + '/eosio.vote/')
 def stepCreateTokens():
     run(args.cleos + 'push action eosio.token create \'["eosio", "10000000000.0000 %s"]\' -p eosio.token' % (args.symbol))
     totalAllocation = allocateFunds(0, len(accounts))
     run(args.cleos + 'push action eosio.token issue \'["eosio", "%s", "memo"]\' -p eosio' % intToCurrency(totalAllocation))
+    run(args.cleos + 'push action eosio.vote create \'["eosio", "50 VOTE"]\' -p eosio.vote')
+    run(args.cleos + 'push action eosio.vote issue \'["eosio", "3 VOTE", "memo"]\' -p eosio')
     sleep(1)
 def stepSetSystemContract():
     # All of the protocol upgrade features introduced in v1.8 first require a special protocol 
@@ -360,7 +364,7 @@ def stepSetSystemContract():
     sleep(3)
 
 def stepInitSystemContract():
-    run(args.cleos + 'push action eosio init' + jsonArg(['0', '4,' + args.symbol]) + '-p eosio@active')
+    run(args.cleos + 'push action eosio init' + jsonArg(['0', '4,' + args.symbol, '0,VOTE']) + '-p eosio@active')
     sleep(1)
 def stepCreateStakedAccounts():
     createStakedAccounts(0, len(accounts))
@@ -415,10 +419,10 @@ commands = [
 
 parser.add_argument('--public-key', metavar='', help="EOSIO Public Key", default='JUN8Znrtgwt8TfpmbVpTKvA2oB8Nqey625CLN8bCN3TEbgx86Dsvr', dest="public_key")
 parser.add_argument('--private-Key', metavar='', help="EOSIO Private Key", default='5K463ynhZoCDDa4RDcr63cUwWLTnKqmdcoTKTHBjqoKfv4u5V7p', dest="private_key")
-parser.add_argument('--cleos', metavar='', help="Cleos command", default='../../build/programs/cleos/cleos --wallet-url http://127.0.0.1:6666 ')
-parser.add_argument('--nodeos', metavar='', help="Path to nodeos binary", default='../../build/programs/nodeos/nodeos')
-parser.add_argument('--keosd', metavar='', help="Path to keosd binary", default='../../build/programs/keosd/keosd')
-parser.add_argument('--contracts-dir', metavar='', help="Path to contracts directory", default='../../build/contracts')
+parser.add_argument('--cleos', metavar='', help="Cleos command", default='../../bin/cleos --wallet-url http://127.0.0.1:6666 ')
+parser.add_argument('--nodeos', metavar='', help="Path to nodeos binary", default='../../bin/nodeos')
+parser.add_argument('--keosd', metavar='', help="Path to keosd binary", default='../../bin/keosd')
+parser.add_argument('--contracts-dir', metavar='', help="Path to contracts directory", default='/home/bobrov/Projects/eosio.contracts/contracts')
 parser.add_argument('--nodes-dir', metavar='', help="Path to nodes directory", default='./nodes/')
 parser.add_argument('--genesis', metavar='', help="Path to genesis.json", default="./genesis.json")
 parser.add_argument('--wallet-dir', metavar='', help="Path to wallet directory", default='./wallet/')
